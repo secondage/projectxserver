@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
 using Beetle;
+using Microsoft.Xna.Framework;
 
 namespace ProjectXServer.Messages
 {
@@ -15,13 +16,28 @@ namespace ProjectXServer.Messages
 
 
     [ProtoContract]
+    public class PlayerLoginRequestMsg
+    {
+        [ProtoMember(1)]
+        public long ClientID { get; set; }
+        [ProtoMember(2)]
+        public string Name { get; set; }
+        [ProtoMember(3)]
+        public string Password { get; set; }
+    }
+
+    [ProtoContract]
     public class PlayerLoginMsg
     {
         [ProtoMember(1)]
-        public string Name { get; set; }
-        [ProtoMember(2)]
         public long ClientID { get; set; }
-    }
+        [ProtoMember(2)]
+        public string Name { get; set; }
+        [ProtoMember(3)]
+        public float[] Position { get; set; }
+        [ProtoMember(4)]
+        public float Speed { get; set; }
+     }
 
 
     [ProtoContract]
@@ -31,6 +47,8 @@ namespace ProjectXServer.Messages
         public LoginResult Result { get; set; }
         [ProtoMember(2)]
         public long ClientID { get; set; }
+        //[ProtoMember(2)]
+        //public long ClientID { get; set; }
     }
 
 }
