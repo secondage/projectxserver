@@ -27,6 +27,7 @@ namespace ProjectXServer
         Return,
         Dead,
         Dying,  //垂死
+        Correct,
     };
     public enum CharacterActionSetChangeFactor
     {
@@ -78,8 +79,10 @@ namespace ProjectXServer
 
     public class ActionOrder : IComparable
     {
-        public Character character;
-        int speed;
+        [NonSerialized]
+        public Character character = null;
+        [NonSerialized]
+        int speed = 0;
 
         public ActionOrder(Character c, int s)
         {
@@ -94,7 +97,7 @@ namespace ProjectXServer
         }
     }
 
-
+    [Serializable]
     public class Character
     {
         public enum DirMethod
@@ -102,8 +105,6 @@ namespace ProjectXServer
             AutoDectect = 0,
             Fixed,
         }
-
-
         public enum OperateType
         {
             None,
@@ -112,10 +113,12 @@ namespace ProjectXServer
             Item,
         };
 
+
         public event EventHandler OnActionCompleted;
         public event EventHandler OnArrived;
         //public event EventHandler OnActionSetsOver;
 
+        [NonSerialized]
         protected int templateid;
 
         protected int hp = 100;
@@ -136,11 +139,14 @@ namespace ProjectXServer
         protected Character interactivetarget;
         protected Vector2 fixedfacedir = new Vector2(1, 0);
         protected DirMethod facedirmethod = DirMethod.AutoDectect;
+        [NonSerialized]
+        protected ActionOrder actionorder = null;
 
         private List<CharacterActionSet> actionsets = new List<CharacterActionSet>();
         private CharacterActionSet currentactionset = null;
 
-        public DateTime MoveStartTime { get; set; }
+        public HiPerfTimer Timer = new HiPerfTimer();
+        public int Direction { get; set; }
 
         public Character(string n, Scene s)
         {
@@ -168,13 +174,17 @@ namespace ProjectXServer
 
         public virtual bool NeedTitle
         {
+           
             get
             {
                 return true;
             }
         }
 
-        public ActionOrder Order { get; set; }
+        public ActionOrder GetOrder() 
+        {
+            return actionorder;
+        }
 
         public string Name
         {
@@ -416,6 +426,14 @@ namespace ProjectXServer
 
         }
 
+        public Vector2 PositionBackup
+        {
+            get
+            {
+                return positionbackup;
+            }
+        }
+
         public void PushPosition()
         {
             positionbackup = Position;
@@ -507,7 +525,7 @@ namespace ProjectXServer
             currentactionset = null;
         }
 
-        
+
     }
 
 

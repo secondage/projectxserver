@@ -9,6 +9,8 @@ namespace ProjectXServer.Messages
 {
     public enum LoginResult
     {
+        Failed_Password = -4,
+        Failed_Notfound = -3,
         Failed_AlreadyLogin = -2,
         Failed = -1,
         Succeed = 1,
@@ -37,7 +39,15 @@ namespace ProjectXServer.Messages
         public float[] Position { get; set; }
         [ProtoMember(4)]
         public float Speed { get; set; }
-     }
+        [ProtoMember(5)]
+        public int HP { get; set; }
+        [ProtoMember(6)]
+        public int MaxHP { get; set; }
+        [ProtoMember(7)]
+        public int ATK { get; set; }
+        [ProtoMember(8)]
+        public int DEF { get; set; }
+    }
 
 
     [ProtoContract]

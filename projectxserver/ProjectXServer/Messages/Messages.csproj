@@ -60,6 +60,7 @@
     <Compile Include="Register.cs" />
     <Compile Include="PlayerLogoutMsg.cs" />
     <Compile Include="PlayerMovementMsg.cs" />
+    <Compile Include="PlayerTimeSyncMsg.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

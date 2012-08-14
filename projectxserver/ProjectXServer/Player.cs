@@ -14,8 +14,13 @@ using Beetle;
 
 namespace ProjectXServer
 {
+    [Serializable]
     public class Player : Character
     {
+        public Player()
+        {
+           
+        }
         public Player(string n, Scene s) :
             base(n, s)
         {
@@ -23,7 +28,7 @@ namespace ProjectXServer
             def = 22;
         }
 
-  
+
         private bool interacting = false;
         public bool Interacting
         {
@@ -35,7 +40,7 @@ namespace ProjectXServer
 
         public long ClientID { get; set; }
         public TcpChannel Channel { get; set; }
-        
+
         public override void Update(GameTime gametime)
         {
             base.Update(gametime);
@@ -49,7 +54,7 @@ namespace ProjectXServer
                 position = target;
                 State = CharacterState.Landing;
                 SendOnArrived(this);
-                
+
             }
             else
             {
@@ -59,7 +64,7 @@ namespace ProjectXServer
             base.UpdateMovement(gametime);
         }
 
-       
-       
+
+
     }
 }
