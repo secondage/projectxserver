@@ -17,6 +17,7 @@ namespace ProjectXServer
         static Scene scene = new Scene("scene1");
         static Random random = new Random();
         static GameTime gametime = new GameTime();
+        static object lockobject = new object();
         static void StartServer()
         {
             gametime = new GameTime();
@@ -28,7 +29,7 @@ namespace ProjectXServer
             server.ChannelDisposed += OnDisposed;
             server.Open(9610);
 
-            //System.Threading.Thread.Sleep(-1);
+            
         }
 
 
@@ -72,9 +73,11 @@ namespace ProjectXServer
                     formatter.Serialize(fs, ps);
                 }
 
-
-                players_byname.Remove(pn.Name);
-                players_byid.Remove(e.Channel.ClientID);
+                lock (lockobject)
+                {
+                    players_byname.Remove(pn.Name);
+                    players_byid.Remove(e.Channel.ClientID);
+                }
                 pn = null;
             }
         }
@@ -148,8 +151,11 @@ namespace ProjectXServer
                                     plrm.ClientID = e.Channel.ClientID;
                                     Messages.ProtobufAdapter.Send(e.Channel, plrm);
                                     //add player to list
-                                    players_byname[pl.Name] = pl;
-                                    players_byid[pl.ClientID] = pl;
+                                    lock (lockobject)
+                                    {
+                                        players_byname[pl.Name] = pl;
+                                        players_byid[pl.ClientID] = pl;
+                                    }
 
                                     foreach (KeyValuePair<string, Player> sp in players_byname)
                                     {
@@ -406,6 +412,7 @@ namespace ProjectXServer
 
                     durtime = 0;
                 }
+                System.Threading.Thread.Sleep(10);
             }
         }
     }
