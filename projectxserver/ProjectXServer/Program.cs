@@ -47,18 +47,21 @@ namespace ProjectXServer
             if (players_byid.ContainsKey(e.Channel.ClientID))
             {
                 Player pn = players_byid[e.Channel.ClientID];
-                foreach (KeyValuePair<string, Player> sp in players_byname)
+                lock (lockobject)
                 {
-                    if (sp.Value.ClientID != e.Channel.ClientID)
+                    foreach (KeyValuePair<string, Player> sp in players_byname)
                     {
-                        Messages.PlayerLogoutMsg plm_sc = new Messages.PlayerLogoutMsg();
-                        plm_sc.ClientID = e.Channel.ClientID;
-                        plm_sc.Name = pn.Name;
-                        Messages.ProtobufAdapter.Send(sp.Value.Channel, plm_sc);
+                        if (sp.Value.ClientID != e.Channel.ClientID)
+                        {
+                            Messages.PlayerLogoutMsg plm_sc = new Messages.PlayerLogoutMsg();
+                            plm_sc.ClientID = e.Channel.ClientID;
+                            plm_sc.Name = pn.Name;
+                            Messages.ProtobufAdapter.Send(sp.Value.Channel, plm_sc);
+                        }
                     }
                 }
 
-                using (FileStream fs = new FileStream(string.Format(@"accounts/{0:s}.xml", pn.Name), FileMode.Create))
+                /*using (FileStream fs = new FileStream(string.Format(@"accounts/{0:s}.xml", pn.Name), FileMode.Create))
                 {
                     PlayerSync ps = new PlayerSync();
                     ps.Name = pn.Name;
@@ -71,7 +74,7 @@ namespace ProjectXServer
                     ps.Position[1] = pn.Position.Y;
                     XmlSerializer formatter = new XmlSerializer(typeof(PlayerSync));
                     formatter.Serialize(fs, ps);
-                }
+                }*/
 
                 lock (lockobject)
                 {
@@ -157,20 +160,36 @@ namespace ProjectXServer
                                         players_byid[pl.ClientID] = pl;
                                     }
 
+                                    Messages.PlayerLoginSelfMsg plms_sc = new Messages.PlayerLoginSelfMsg();
+                                    plms_sc.Position = new float[2];
+                                    plms_sc.ClientID = pl.ClientID;
+                                    plms_sc.Name = pl.Name;
+                                    plms_sc.Position[0] = pl.Position.X;
+                                    plms_sc.Position[1] = pl.Position.Y;
+                                    plms_sc.Speed = pl.Speed;
+                                    plms_sc.ATK = pl.ATK;
+                                    plms_sc.DEF = pl.DEF;
+                                    plms_sc.HP = pl.HP;
+                                    plms_sc.MaxHP = pl.MaxHP;
+                                    Messages.ProtobufAdapter.Send(e.Channel, plms_sc);
+
                                     foreach (KeyValuePair<string, Player> sp in players_byname)
                                     {
-                                        Messages.PlayerLoginMsg plm_sc = new Messages.PlayerLoginMsg();
-                                        plm_sc.Position = new float[2];
-                                        plm_sc.ClientID = sp.Value.ClientID;
-                                        plm_sc.Name = sp.Value.Name;
-                                        plm_sc.Position[0] = sp.Value.Position.X;
-                                        plm_sc.Position[1] = sp.Value.Position.Y;
-                                        plm_sc.Speed = sp.Value.Speed;
-                                        plm_sc.ATK = sp.Value.ATK;
-                                        plm_sc.DEF = sp.Value.DEF;
-                                        plm_sc.HP = sp.Value.HP;
-                                        plm_sc.MaxHP = sp.Value.MaxHP;
-                                        Messages.ProtobufAdapter.Send(e.Channel, plm_sc);
+                                        if (sp.Value.ClientID != pl.ClientID)
+                                        {
+                                            Messages.PlayerLoginMsg plm_sc = new Messages.PlayerLoginMsg();
+                                            plm_sc.Position = new float[2];
+                                            plm_sc.ClientID = sp.Value.ClientID;
+                                            plm_sc.Name = sp.Value.Name;
+                                            plm_sc.Position[0] = sp.Value.Position.X;
+                                            plm_sc.Position[1] = sp.Value.Position.Y;
+                                            plm_sc.Speed = sp.Value.Speed;
+                                            plm_sc.ATK = sp.Value.ATK;
+                                            plm_sc.DEF = sp.Value.DEF;
+                                            plm_sc.HP = sp.Value.HP;
+                                            plm_sc.MaxHP = sp.Value.MaxHP;
+                                            Messages.ProtobufAdapter.Send(e.Channel, plm_sc);
+                                        }
                                     }
                                     //send player login to other client
                                     foreach (KeyValuePair<string, Player> sp in players_byname)
@@ -405,11 +424,13 @@ namespace ProjectXServer
                     Messages.PlayerTimeSyncMsg msg_sc = new Messages.PlayerTimeSyncMsg();
                     msg_sc.Total = totaltime;
                     msg_sc.Duration = durtime;
-                    foreach (KeyValuePair<string, Player> sp in players_byname)
+                    lock (lockobject)
                     {
-                        Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                        foreach (KeyValuePair<string, Player> sp in players_byname)
+                        {
+                            Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                        }
                     }
-
                     durtime = 0;
                 }
                 System.Threading.Thread.Sleep(10);

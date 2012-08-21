@@ -51,6 +51,29 @@ namespace ProjectXServer.Messages
 
 
     [ProtoContract]
+    public class PlayerLoginSelfMsg
+    {
+        [ProtoMember(1)]
+        public long ClientID { get; set; }
+        [ProtoMember(2)]
+        public string Name { get; set; }
+        [ProtoMember(3)]
+        public float[] Position { get; set; }
+        [ProtoMember(4)]
+        public float Speed { get; set; }
+        [ProtoMember(5)]
+        public int HP { get; set; }
+        [ProtoMember(6)]
+        public int MaxHP { get; set; }
+        [ProtoMember(7)]
+        public int ATK { get; set; }
+        [ProtoMember(8)]
+        public int DEF { get; set; }
+    }
+
+
+
+    [ProtoContract]
     public class PlayerLoginResultMsg
     {
         [ProtoMember(1)]
