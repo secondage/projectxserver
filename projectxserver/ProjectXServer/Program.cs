@@ -35,7 +35,7 @@ namespace ProjectXServer
 
         static void OnConnected(object sender, ChannelEventArgs e)
         {
-            e.Channel.SetPackage<Messages.HeadSizePackage>().ReceiveMessage = OnMessageReceive;
+            e.Channel.SetPackage<HeadSizePackage>().ReceiveMessage = OnMessageReceive;
             e.Channel.BeginReceive();
             Console.WriteLine("{0} connected.", e.Channel.EndPoint);
 
@@ -53,15 +53,15 @@ namespace ProjectXServer
                     {
                         if (sp.Value.ClientID != e.Channel.ClientID)
                         {
-                            Messages.PlayerLogoutMsg plm_sc = new Messages.PlayerLogoutMsg();
+                            PlayerLogoutMsg plm_sc = new PlayerLogoutMsg();
                             plm_sc.ClientID = e.Channel.ClientID;
                             plm_sc.Name = pn.Name;
-                            Messages.ProtobufAdapter.Send(sp.Value.Channel, plm_sc);
+                            ProtobufAdapter.Send(sp.Value.Channel, plm_sc);
                         }
                     }
                 }
 
-                /*using (FileStream fs = new FileStream(string.Format(@"accounts/{0:s}.xml", pn.Name), FileMode.Create))
+                using (FileStream fs = new FileStream(string.Format(@"accounts/{0:s}.xml", pn.Name), FileMode.Create))
                 {
                     PlayerSync ps = new PlayerSync();
                     ps.Name = pn.Name;
@@ -74,7 +74,7 @@ namespace ProjectXServer
                     ps.Position[1] = pn.Position.Y;
                     XmlSerializer formatter = new XmlSerializer(typeof(PlayerSync));
                     formatter.Serialize(fs, ps);
-                }*/
+                }
 
                 lock (lockobject)
                 {
@@ -88,18 +88,18 @@ namespace ProjectXServer
 
         static void OnMessageReceive(PacketRecieveMessagerArgs e)
         {
-            Messages.ProtobufAdapter adapter = (Messages.ProtobufAdapter)e.Message;
+            ProtobufAdapter adapter = (ProtobufAdapter)e.Message;
             Type type = adapter.Message.GetType();
             switch (type.Name)
             {
                 case "PlayerLoginRequestMsg":
                     {
-                        Messages.PlayerLoginRequestMsg plm_cs = (Messages.PlayerLoginRequestMsg)adapter.Message;
+                        PlayerLoginRequestMsg plm_cs = (PlayerLoginRequestMsg)adapter.Message;
                         if (players_byname.ContainsKey(plm_cs.Name))
                         {
-                            Messages.PlayerLoginResultMsg plrm = new Messages.PlayerLoginResultMsg();
-                            plrm.Result = Messages.LoginResult.Failed_AlreadyLogin;
-                            Messages.ProtobufAdapter.Send(e.Channel, plrm);
+                            PlayerLoginResultMsg plrm = new PlayerLoginResultMsg();
+                            plrm.Result = LoginResult.Failed_AlreadyLogin;
+                            ProtobufAdapter.Send(e.Channel, plrm);
                         }
                         else
                         {
@@ -126,9 +126,9 @@ namespace ProjectXServer
                                 //check password
                                 if (ps.Password != plm_cs.Password)
                                 {
-                                    Messages.PlayerLoginResultMsg plrm = new Messages.PlayerLoginResultMsg();
-                                    plrm.Result = Messages.LoginResult.Failed_Password;
-                                    Messages.ProtobufAdapter.Send(e.Channel, plrm);
+                                    PlayerLoginResultMsg plrm = new PlayerLoginResultMsg();
+                                    plrm.Result = LoginResult.Failed_Password;
+                                    ProtobufAdapter.Send(e.Channel, plrm);
                                     break;
                                 }
                                 else
@@ -149,10 +149,10 @@ namespace ProjectXServer
                                     pl.DEF = ps.DEF;
 
                                     //send succeed msg
-                                    Messages.PlayerLoginResultMsg plrm = new Messages.PlayerLoginResultMsg();
-                                    plrm.Result = Messages.LoginResult.Succeed;
+                                    PlayerLoginResultMsg plrm = new PlayerLoginResultMsg();
+                                    plrm.Result = LoginResult.Succeed;
                                     plrm.ClientID = e.Channel.ClientID;
-                                    Messages.ProtobufAdapter.Send(e.Channel, plrm);
+                                    ProtobufAdapter.Send(e.Channel, plrm);
                                     //add player to list
                                     lock (lockobject)
                                     {
@@ -160,7 +160,7 @@ namespace ProjectXServer
                                         players_byid[pl.ClientID] = pl;
                                     }
 
-                                    Messages.PlayerLoginSelfMsg plms_sc = new Messages.PlayerLoginSelfMsg();
+                                    PlayerLoginSelfMsg plms_sc = new PlayerLoginSelfMsg();
                                     plms_sc.Position = new float[2];
                                     plms_sc.ClientID = pl.ClientID;
                                     plms_sc.Name = pl.Name;
@@ -171,13 +171,13 @@ namespace ProjectXServer
                                     plms_sc.DEF = pl.DEF;
                                     plms_sc.HP = pl.HP;
                                     plms_sc.MaxHP = pl.MaxHP;
-                                    Messages.ProtobufAdapter.Send(e.Channel, plms_sc);
+                                    ProtobufAdapter.Send(e.Channel, plms_sc);
 
                                     foreach (KeyValuePair<string, Player> sp in players_byname)
                                     {
                                         if (sp.Value.ClientID != pl.ClientID)
                                         {
-                                            Messages.PlayerLoginMsg plm_sc = new Messages.PlayerLoginMsg();
+                                            PlayerLoginMsg plm_sc = new PlayerLoginMsg();
                                             plm_sc.Position = new float[2];
                                             plm_sc.ClientID = sp.Value.ClientID;
                                             plm_sc.Name = sp.Value.Name;
@@ -188,7 +188,7 @@ namespace ProjectXServer
                                             plm_sc.DEF = sp.Value.DEF;
                                             plm_sc.HP = sp.Value.HP;
                                             plm_sc.MaxHP = sp.Value.MaxHP;
-                                            Messages.ProtobufAdapter.Send(e.Channel, plm_sc);
+                                            ProtobufAdapter.Send(e.Channel, plm_sc);
                                         }
                                     }
                                     //send player login to other client
@@ -196,7 +196,7 @@ namespace ProjectXServer
                                     {
                                         if (sp.Value.ClientID != pl.ClientID)
                                         {
-                                            Messages.PlayerLoginMsg plm_sc = new Messages.PlayerLoginMsg();
+                                            PlayerLoginMsg plm_sc = new PlayerLoginMsg();
                                             plm_sc.Position = new float[2];
                                             plm_sc.ClientID = pl.ClientID;
                                             plm_sc.Name = pl.Name;
@@ -207,23 +207,23 @@ namespace ProjectXServer
                                             plm_sc.DEF = pl.DEF;
                                             plm_sc.HP = pl.HP;
                                             plm_sc.MaxHP = pl.MaxHP;
-                                            Messages.ProtobufAdapter.Send(sp.Value.Channel, plm_sc);
+                                            ProtobufAdapter.Send(sp.Value.Channel, plm_sc);
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                Messages.PlayerLoginResultMsg plrm = new Messages.PlayerLoginResultMsg();
-                                plrm.Result = Messages.LoginResult.Failed_Notfound;
-                                Messages.ProtobufAdapter.Send(e.Channel, plrm);
+                                PlayerLoginResultMsg plrm = new PlayerLoginResultMsg();
+                                plrm.Result = LoginResult.Failed_Notfound;
+                                ProtobufAdapter.Send(e.Channel, plrm);
                             }
                         }
                         break;
                     }
                 case "PlayerTargetChanged":
                     {
-                        Messages.PlayerTargetChanged msg_cs = (Messages.PlayerTargetChanged)adapter.Message;
+                        PlayerTargetChanged msg_cs = (PlayerTargetChanged)adapter.Message;
                         if (players_byid.ContainsKey(e.Channel.ClientID))
                         {
 
@@ -255,7 +255,7 @@ namespace ProjectXServer
                             {
                                 if (sp.Value.ClientID != player.ClientID)
                                 {
-                                    Messages.PlayerTargetChanged msg_sc = new Messages.PlayerTargetChanged();
+                                    PlayerTargetChanged msg_sc = new PlayerTargetChanged();
                                     msg_sc.ClientID = player.ClientID;
                                     msg_sc.Target = new float[2];
                                     msg_sc.Target[0] = player.Target.X;
@@ -263,7 +263,7 @@ namespace ProjectXServer
                                     msg_sc.Position = new float[2];
                                     msg_sc.Position[0] = player.Position.X;
                                     msg_sc.Position[1] = player.Position.Y;
-                                    Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                                    ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
                                 }
                             }
                             player.Timer.Start();
@@ -272,7 +272,7 @@ namespace ProjectXServer
                     }
                 case "PlayerMoveRequest":
                     {
-                        Messages.PlayerMoveRequest msg_cs = (Messages.PlayerMoveRequest)adapter.Message;
+                        PlayerMoveRequest msg_cs = (PlayerMoveRequest)adapter.Message;
                         if (players_byid.ContainsKey(e.Channel.ClientID))
                         {
                             Player player = players_byid[e.Channel.ClientID];
@@ -298,12 +298,12 @@ namespace ProjectXServer
                             {
                                 if (sp.Value.ClientID != player.ClientID)
                                 {
-                                    Messages.PlayerMoveRequest msg_sc = new Messages.PlayerMoveRequest();
+                                    PlayerMoveRequest msg_sc = new PlayerMoveRequest();
                                     msg_sc.ClientID = player.ClientID;
                                     msg_sc.Target = new float[2];
                                     msg_sc.Target[0] = player.Target.X;
                                     msg_sc.Target[1] = player.Target.Y;
-                                    Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                                    ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
                                 }
                             }
                             player.Timer.Start();
@@ -312,7 +312,7 @@ namespace ProjectXServer
                     }
                 case "PlayerStopRequest":
                     {
-                        Messages.PlayerStopRequest msg_cs = (Messages.PlayerStopRequest)adapter.Message;
+                        PlayerStopRequest msg_cs = (PlayerStopRequest)adapter.Message;
                         if (players_byid.ContainsKey(e.Channel.ClientID))
                         {
                             Player player = players_byid[e.Channel.ClientID];
@@ -377,7 +377,7 @@ namespace ProjectXServer
         {
             foreach (KeyValuePair<string, Player> sp in players_byname)
             {
-                Messages.PlayerPositionUpdate msg_sc = new Messages.PlayerPositionUpdate();
+                PlayerPositionUpdate msg_sc = new PlayerPositionUpdate();
                 msg_sc.ClientID = player.ClientID;
                 player.PopPosition();
                 player.State = CharacterState.Idle;
@@ -385,7 +385,7 @@ namespace ProjectXServer
                 msg_sc.Position[0] = player.Position.X;
                 msg_sc.Position[1] = player.Position.Y;
                 msg_sc.State = (int)CharacterState.Correct;
-                Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
             }
         }
 
@@ -394,14 +394,14 @@ namespace ProjectXServer
         {
             foreach (KeyValuePair<string, Player> sp in players_byname)
             {
-                Messages.PlayerPositionUpdate msg_sc = new Messages.PlayerPositionUpdate();
+                PlayerPositionUpdate msg_sc = new PlayerPositionUpdate();
                 msg_sc.ClientID = player.ClientID;
                 msg_sc.Position = new float[2];
                 msg_sc.Position[0] = player.Position.X;
                 msg_sc.Position[1] = player.Position.Y;
                 msg_sc.State = (int)CharacterState.Idle;
                 msg_sc.Dir = player.Direction;
-                Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
             }
         }
 
@@ -421,14 +421,14 @@ namespace ProjectXServer
                 {
                     totaltime += durtime;
                     //Console.WriteLine("time is {0:f}", durtime);
-                    Messages.PlayerTimeSyncMsg msg_sc = new Messages.PlayerTimeSyncMsg();
+                    PlayerTimeSyncMsg msg_sc = new PlayerTimeSyncMsg();
                     msg_sc.Total = totaltime;
                     msg_sc.Duration = durtime;
                     lock (lockobject)
                     {
                         foreach (KeyValuePair<string, Player> sp in players_byname)
                         {
-                            Messages.ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
+                            ProtobufAdapter.Send(sp.Value.Channel, msg_sc);
                         }
                     }
                     durtime = 0;

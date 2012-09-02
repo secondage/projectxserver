@@ -74,6 +74,14 @@
   <ItemGroup>
     <Compile Include="Character.cs" />
     <Compile Include="Monster.cs" />
+    <Compile Include="msg\HeadSizePackage.cs" />
+    <Compile Include="msg\PlayerLoginMsg.cs" />
+    <Compile Include="msg\PlayerLogoutMsg.cs" />
+    <Compile Include="msg\PlayerMovementMsg.cs" />
+    <Compile Include="msg\PlayerStatus.cs" />
+    <Compile Include="msg\PlayerTimeSyncMsg.cs" />
+    <Compile Include="msg\ProtobufAdapter.cs" />
+    <Compile Include="msg\Register.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,10 +98,6 @@
     <ProjectReference Include="..\NetSyncObject\NetSyncObject.csproj">
       <Project>{1607D04E-D890-4F13-A6F4-93F972339170}</Project>
       <Name>NetSyncObject</Name>
-    </ProjectReference>
-    <ProjectReference Include="Messages\Messages.csproj">
-      <Project>{E701B4D6-4482-4410-A2A8-85BE22D2A539}</Project>
-      <Name>Messages</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@ using ProtoBuf;
 using Beetle;
 using Microsoft.Xna.Framework;
 
-namespace ProjectXServer
+namespace ProjectXServer.MessagesWP7
 {
     public enum LoginResult
     {

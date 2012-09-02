@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Beetle;
-namespace ProjectXServer
+namespace ProjectXServer.MessagesWP7
 {
     public class ProtobufAdapter:IMessage
     {
@@ -11,38 +11,35 @@ namespace ProjectXServer
             get;
             set;
         }
-        public static bool Send(Beetle.TcpChannel channel, object msg)
+        public static void Send(Beetle.TcpChannel channel, object msg)
         {
             ProtobufAdapter adapter = new ProtobufAdapter();
             adapter.Message = msg;
-            return channel.Send(adapter);
-
+            channel.Send(adapter);
         }
         public void Load(Beetle.BufferReader reader)
         {
             string type = reader.ReadString();
-            Beetle.ByteArraySegment segment = mArrayPool.Pop();
-            reader.ReadByteArray(segment);
-            using (System.IO.Stream stream = new System.IO.MemoryStream(segment.Array,0,segment.Count))
+            //Beetle.ByteArraySegment segment = mArrayPool.Pop();
+            byte[] data = reader.ReadByteArray();
+            using (System.IO.Stream stream = new System.IO.MemoryStream(data, 0, data.Length))
             {
                 Message = ProtoBuf.Meta.RuntimeTypeModel.Default.Deserialize(stream, null, Type.GetType(type));
             }
-            mArrayPool.Push(segment);
         }
         public void Save(Beetle.BufferWriter writer)
         {
             writer.Write(Message.GetType().FullName);
-            Beetle.ByteArraySegment segment = mArrayPool.Pop();
-            using(System.IO.Stream stream = new System.IO.MemoryStream(segment.Array))
+            byte[] data;
+            using (System.IO.Stream stream = new System.IO.MemoryStream())
             {
                 ProtoBuf.Meta.RuntimeTypeModel.Default.Serialize(stream, Message);
-                segment.SetInfo(0, (int)stream.Position);
-                
+                data = new byte[stream.Length];
+                stream.Position = 0;
+                stream.Read(data, 0, data.Length);
             }
-            writer.Write(segment);
-            mArrayPool.Push(segment);
-            
+            writer.Write(data);
         }
-        private static ByteArrayPool mArrayPool = new ByteArrayPool(100, 1024 * 8);
+        
     }
 }

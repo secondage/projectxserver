@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
 using Beetle;
-using Microsoft.Xna.Framework;
 
-namespace ProjectXServer
+namespace ProjectXServer.Messages
 {
     [ProtoContract]
-    public class PlayerTimeSyncMsg
+    public class PlayerLogoutMsg
     {
         [ProtoMember(1)]
-        public double Duration { get; set; }
+        public string Name { get; set; }
         [ProtoMember(2)]
-        public double Total { get; set; }
+        public long ClientID { get; set; }
     }
 
-    
 
 }

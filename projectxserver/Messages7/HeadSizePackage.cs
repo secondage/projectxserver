@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ProjectXServer
+namespace ProjectXServer.Messages
 {
     public class HeadSizePackage:Beetle.HeadSizeOfPackage
     {
-        public HeadSizePackage(Beetle.TcpChannel channel)
-            : base(channel)
+        public HeadSizePackage(/*Beetle.TcpChannel channel*/)
         {
         }
         protected override Beetle.IMessage ReadMessageByType(Beetle.BufferReader reader, out object typeTag)

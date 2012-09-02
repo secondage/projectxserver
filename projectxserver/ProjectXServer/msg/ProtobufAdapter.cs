@@ -20,7 +20,8 @@ namespace ProjectXServer
         }
         public void Load(Beetle.BufferReader reader)
         {
-            string type = reader.ReadString();
+            string type = "ProjectXServer.";
+            type += reader.ReadString();
             Beetle.ByteArraySegment segment = mArrayPool.Pop();
             reader.ReadByteArray(segment);
             using (System.IO.Stream stream = new System.IO.MemoryStream(segment.Array,0,segment.Count))
@@ -31,7 +32,7 @@ namespace ProjectXServer
         }
         public void Save(Beetle.BufferWriter writer)
         {
-            writer.Write(Message.GetType().FullName);
+            writer.Write(Message.GetType().Name);
             Beetle.ByteArraySegment segment = mArrayPool.Pop();
             using(System.IO.Stream stream = new System.IO.MemoryStream(segment.Array))
             {

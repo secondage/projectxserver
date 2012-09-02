@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
 
-namespace ProjectXServer
+namespace ProjectXServer.Messages
 {
     [ProtoContract]
     public class PlayerStatus

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
-namespace ProjectXServer
+namespace ProjectXServer.MessagesWP7
 {
     [ProtoContract]
     public class Register

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<PlayerSync xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>test6</Name>
+  <Password>69-8D-51-A1-9D-8A-12-1C-E5-81-49-9D-7B-70-16-68</Password>
+  <Speed>200</Speed>
+  <HP>100</HP>
+  <MaxHP>100</MaxHP>
+  <ATK>134</ATK>
+  <DEF>22</DEF>
+  <Position>
+    <float>47.34079</float>
+    <float>36.808548</float>
+  </Position>
+</PlayerSync>
